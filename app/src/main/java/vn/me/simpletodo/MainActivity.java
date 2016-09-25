@@ -7,21 +7,16 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
 
-import org.apache.commons.io.FileUtils;
-
-import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
 
-    private ArrayList<String> items;
-    private ArrayAdapter<String> itemsAdapter;
+    private ArrayList<TodoItem> items;
+    private ItemsAdapter itemsAdapter;
     private ListView lvItems;
     private EditText etNewItem;
     private int editingPos = -1;
@@ -31,10 +26,10 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        readItems();
+        readItemsFromDB();
         lvItems = (ListView) findViewById(R.id.lvItems);
         etNewItem = (EditText) findViewById(R.id.etNewItem);
-        itemsAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, items);
+        itemsAdapter = new ItemsAdapter(this, items);
         lvItems.setAdapter(itemsAdapter);
         setupListViewListener();
         lvItems.requestFocus();
@@ -58,7 +53,7 @@ public class MainActivity extends AppCompatActivity {
                     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                         editingPos = position;
                         Intent i = new Intent(MainActivity.this, EditItemActivity.class);
-                        i.putExtra(GlobalConstants.ITEM, items.get(position));
+                        i.putExtra(GlobalConstants.ITEM, items.get(position).content);
                         startActivityForResult(i, GlobalConstants.REQUEST_CODE);
                     }
                 }
@@ -68,7 +63,7 @@ public class MainActivity extends AppCompatActivity {
     public void onAddItem(View view) {
         String itemText = etNewItem.getText().toString();
         if (!itemText.isEmpty()) {
-            itemsAdapter.add(itemText);
+            itemsAdapter.add(new TodoItem(itemText));
             etNewItem.setText("");
             writeItems();
             hideSoftKeyboard(etNewItem);
@@ -78,24 +73,24 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void readItems() {
-        File filesDir = getFilesDir();
-        File taskFile = new File(filesDir, GlobalConstants.TASK_FILE);
-        try {
-            items = new ArrayList<>(FileUtils.readLines(taskFile));
-        } catch (IOException e) {
-            items = new ArrayList<>();
-            e.printStackTrace();
-        }
+//        File filesDir = getFilesDir();
+//        File taskFile = new File(filesDir, GlobalConstants.TASK_FILE);
+//        try {
+//            items = new ArrayList<>(FileUtils.readLines(taskFile));
+//        } catch (IOException e) {
+//            items = new ArrayList<>();
+//            e.printStackTrace();
+//        }
     }
 
     private void writeItems() {
-        File fileDir = getFilesDir();
-        File taskFile = new File(fileDir, GlobalConstants.TASK_FILE);
-        try {
-            FileUtils.writeLines(taskFile, items);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+//        File fileDir = getFilesDir();
+//        File taskFile = new File(fileDir, GlobalConstants.TASK_FILE);
+//        try {
+//            FileUtils.writeLines(taskFile, items);
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
     }
 
     @Override
@@ -103,7 +98,8 @@ public class MainActivity extends AppCompatActivity {
         if (requestCode == GlobalConstants.REQUEST_CODE && resultCode == RESULT_OK) {
             if (editingPos != -1) {
                 String newContent = data.getStringExtra(GlobalConstants.ITEM);
-                items.set(editingPos, newContent);
+                TodoItem item = items.get(editingPos);
+                item.content = newContent;
                 itemsAdapter.notifyDataSetChanged();
                 editingPos = -1;
                 writeItems();
@@ -115,5 +111,9 @@ public class MainActivity extends AppCompatActivity {
     public void hideSoftKeyboard(View view) {
         InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
         imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+    }
+
+    private void readItemsFromDB() {
+        items = new ArrayList<>();
     }
 }
