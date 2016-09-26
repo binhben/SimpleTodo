@@ -5,7 +5,12 @@ package vn.me.simpletodo;
  */
 
 public class GlobalConstants {
+    public static final String TAG = "SimpleTodo";
+
     public static final String TASK_FILE = "todo.txt";
     public static final String ITEM = "item";
+    public static final String POSITION = "position";
+
     public static final int REQUEST_CODE = 12;
+
 }

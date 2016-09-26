@@ -6,7 +6,6 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
@@ -31,33 +30,7 @@ public class MainActivity extends AppCompatActivity {
         etNewItem = (EditText) findViewById(R.id.etNewItem);
         itemsAdapter = new ItemsAdapter(this, items);
         lvItems.setAdapter(itemsAdapter);
-        setupListViewListener();
         lvItems.requestFocus();
-    }
-
-    private void setupListViewListener() {
-        lvItems.setOnItemLongClickListener(
-                new AdapterView.OnItemLongClickListener() {
-                    @Override
-                    public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-                        items.remove(position);
-                        itemsAdapter.notifyDataSetChanged();
-                        writeItems();
-                        return true;
-                    }
-                }
-        );
-        lvItems.setOnItemClickListener(
-                new AdapterView.OnItemClickListener() {
-                    @Override
-                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                        editingPos = position;
-                        Intent i = new Intent(MainActivity.this, EditItemActivity.class);
-                        i.putExtra(GlobalConstants.ITEM, items.get(position).content);
-                        startActivityForResult(i, GlobalConstants.REQUEST_CODE);
-                    }
-                }
-        );
     }
 
     public void onAddItem(View view) {
@@ -96,14 +69,14 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == GlobalConstants.REQUEST_CODE && resultCode == RESULT_OK) {
-            if (editingPos != -1) {
+            int position = data.getIntExtra(GlobalConstants.POSITION, -1);
+            if (position != -1) {
                 String newContent = data.getStringExtra(GlobalConstants.ITEM);
-                TodoItem item = items.get(editingPos);
+                TodoItem item = items.get(position);
                 item.content = newContent;
                 itemsAdapter.notifyDataSetChanged();
-                editingPos = -1;
                 writeItems();
-                Toast.makeText(this, "Edit successful", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Edit successfully", Toast.LENGTH_SHORT).show();
             }
         }
     }

@@ -11,13 +11,16 @@ import android.widget.EditText;
 public class EditItemActivity extends AppCompatActivity {
 
     private EditText etContent;
+    private String content;
+    private int position;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit_item);
 
-        String content = getIntent().getStringExtra(GlobalConstants.ITEM);
+        content = getIntent().getStringExtra(GlobalConstants.ITEM);
+        position = getIntent().getIntExtra(GlobalConstants.POSITION, -1);
         etContent = (EditText) findViewById(R.id.etContent);
         etContent.setText(content);
         etContent.setSelection(content.length());
@@ -30,6 +33,7 @@ public class EditItemActivity extends AppCompatActivity {
         hideSoftKeyboard(etContent);
         Intent data = new Intent();
         data.putExtra(GlobalConstants.ITEM, newContent);
+        data.putExtra(GlobalConstants.POSITION, position);
         setResult(RESULT_OK, data);
         finish();
     }
