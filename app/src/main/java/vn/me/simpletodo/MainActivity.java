@@ -36,34 +36,14 @@ public class MainActivity extends AppCompatActivity {
     public void onAddItem(View view) {
         String itemText = etNewItem.getText().toString();
         if (!itemText.isEmpty()) {
-            itemsAdapter.add(new TodoItem(itemText));
+            TodoItem item = new TodoItem(itemText);
+            item.save();
+            itemsAdapter.add(item);
             etNewItem.setText("");
-            writeItems();
             hideSoftKeyboard(etNewItem);
         } else {
             Toast.makeText(this, "New item is empty", Toast.LENGTH_SHORT).show();
         }
-    }
-
-    private void readItems() {
-//        File filesDir = getFilesDir();
-//        File taskFile = new File(filesDir, GlobalConstants.TASK_FILE);
-//        try {
-//            items = new ArrayList<>(FileUtils.readLines(taskFile));
-//        } catch (IOException e) {
-//            items = new ArrayList<>();
-//            e.printStackTrace();
-//        }
-    }
-
-    private void writeItems() {
-//        File fileDir = getFilesDir();
-//        File taskFile = new File(fileDir, GlobalConstants.TASK_FILE);
-//        try {
-//            FileUtils.writeLines(taskFile, items);
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
     }
 
     @Override
@@ -74,8 +54,8 @@ public class MainActivity extends AppCompatActivity {
                 String newContent = data.getStringExtra(GlobalConstants.ITEM);
                 TodoItem item = items.get(position);
                 item.content = newContent;
+                item.save();
                 itemsAdapter.notifyDataSetChanged();
-                writeItems();
                 Toast.makeText(this, "Edit successfully", Toast.LENGTH_SHORT).show();
             }
         }
@@ -88,5 +68,6 @@ public class MainActivity extends AppCompatActivity {
 
     private void readItemsFromDB() {
         items = new ArrayList<>();
+        items.addAll(TodoItem.listAll(TodoItem.class));
     }
 }

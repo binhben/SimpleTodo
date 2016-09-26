@@ -50,6 +50,7 @@ public class ItemsAdapter extends ArrayAdapter<TodoItem> {
             @Override
             public boolean onLongClick(View view) {
                 mItems.remove(position);
+                item.delete();
                 notifyDataSetChanged();
                 return true;
             }
