@@ -4,6 +4,8 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.support.annotation.NonNull;
+import android.support.v4.app.FragmentManager;
+import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -39,10 +41,8 @@ public class ItemsAdapter extends ArrayAdapter<TodoItem> {
         tvContent.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(mContext, EditItemActivity.class);
-                intent.putExtra(GlobalConstants.ITEM, item.content);
-                intent.putExtra(GlobalConstants.POSITION, position);
-                ((Activity) mContext).startActivityForResult(intent, GlobalConstants.REQUEST_CODE);
+                showEditActivity(item, position);
+                // showEditDialog(item, position);
             }
         });
 
@@ -58,5 +58,18 @@ public class ItemsAdapter extends ArrayAdapter<TodoItem> {
 
         tvContent.setText(item.content);
         return convertView;
+    }
+
+    private void showEditActivity(TodoItem item, int position) {
+        Intent intent = new Intent(mContext, EditItemActivity.class);
+        intent.putExtra(GlobalConstants.ITEM, item.content);
+        intent.putExtra(GlobalConstants.POSITION, position);
+        ((Activity) mContext).startActivityForResult(intent, GlobalConstants.REQUEST_CODE);
+    }
+
+    private void showEditDialog(TodoItem item, int position) {
+        FragmentManager fm = ((AppCompatActivity) mContext).getSupportFragmentManager();
+        EditItemDialogFragment ef = EditItemDialogFragment.newInstance(item.content, position);
+        ef.show(fm, "fragment_edit_item");
     }
 }
