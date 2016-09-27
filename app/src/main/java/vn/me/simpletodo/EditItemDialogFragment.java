@@ -6,6 +6,7 @@ import android.support.v4.app.DialogFragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.EditText;
 
 /**
@@ -40,9 +41,28 @@ public class EditItemDialogFragment extends DialogFragment {
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
         String content = getArguments().getString(GlobalConstants.CONTENT, "");
         etContent = (EditText) view.findViewById(R.id.etContent);
         etContent.setText(content);
         etContent.requestFocus();
+
+        Button btnCancel = (Button) view.findViewById(R.id.btnCancel);
+        btnCancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dismiss();
+            }
+        });
+
+        Button btnOk = (Button) view.findViewById(R.id.btnOk);
+        btnOk.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                EditItemDialogListener listener = (EditItemDialogListener) getActivity();
+                listener.onFinishEditDialog(etContent.getText().toString(), position);
+                dismiss();
+            }
+        });
     }
 }

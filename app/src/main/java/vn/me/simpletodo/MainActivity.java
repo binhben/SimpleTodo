@@ -12,7 +12,7 @@ import android.widget.Toast;
 
 import java.util.ArrayList;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements EditItemDialogListener {
 
     private ArrayList<TodoItem> items;
     private ItemsAdapter itemsAdapter;
@@ -69,5 +69,16 @@ public class MainActivity extends AppCompatActivity {
     private void readItemsFromDB() {
         items = new ArrayList<>();
         items.addAll(TodoItem.listAll(TodoItem.class));
+    }
+
+    @Override
+    public void onFinishEditDialog(String newContent, int position) {
+        TodoItem item = items.get(position);
+        if (!newContent.equals("") && !item.content.equals(newContent)) {
+            item.content = newContent;
+            item.save();
+            itemsAdapter.notifyDataSetChanged();
+            Toast.makeText(this, "Edit successfully", Toast.LENGTH_SHORT).show();
+        }
     }
 }

@@ -4,4 +4,6 @@
     <string name="new_item_hint_label">Enter a new item</string>
     <string name="guide_edit_item_label">Edit item below:</string>
     <string name="save_label">Save</string>
+    <string name="cancel_label">Cancel</string>
+    <string name="ok_label">Ok</string>
 </resources>

@@ -41,8 +41,8 @@ public class ItemsAdapter extends ArrayAdapter<TodoItem> {
         tvContent.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                showEditActivity(item, position);
-                // showEditDialog(item, position);
+                //showEditActivity(item, position);
+                showEditDialog(item, position);
             }
         });
 
