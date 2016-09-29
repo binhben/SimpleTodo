@@ -15,7 +15,6 @@ import android.widget.ImageView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
 /**
@@ -120,8 +119,8 @@ public class EditItemDialogFragment extends DialogFragment implements DatePicker
         });
 
         if (time > 0) {
-            showDate(storedDate.get(Calendar.YEAR), storedDate.get(Calendar.MONTH), storedDate.get(Calendar.DAY_OF_MONTH));
-            showTime(storedDate.get(Calendar.HOUR_OF_DAY), storedDate.get(Calendar.MINUTE));
+            etDate.setText(GlobalConstants.getFormattedDate(storedDate.get(Calendar.YEAR), storedDate.get(Calendar.MONTH), storedDate.get(Calendar.DAY_OF_MONTH), true));
+            etTime.setText(GlobalConstants.getFormattedTime(storedDate.get(Calendar.HOUR_OF_DAY), storedDate.get(Calendar.MINUTE)));
         }
     }
 
@@ -139,36 +138,13 @@ public class EditItemDialogFragment extends DialogFragment implements DatePicker
     @Override
     public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
         storedDate.set(year, monthOfYear, dayOfMonth);
-        showDate(year, monthOfYear, dayOfMonth);
-    }
-
-    private void showDate(int year, int monthOfYear, int dayOfMonth) {
-        String strDate = "";
-        Calendar c = Calendar.getInstance();
-        c.add(Calendar.DAY_OF_YEAR, 1);
-        if (c.get(Calendar.DAY_OF_MONTH) == dayOfMonth) {
-            strDate = "Tomorrow";
-        } else {
-            String pattern = c.get(Calendar.YEAR) == year ? "MMMM d" : "MMMM d, yyyy";
-            SimpleDateFormat f = new SimpleDateFormat(pattern);
-            c.set(year, monthOfYear, dayOfMonth);
-            strDate = f.format(c.getTime());
-        }
-        etDate.setText(strDate);
+        etDate.setText(GlobalConstants.getFormattedDate(year, monthOfYear, dayOfMonth, true));
     }
 
     @Override
     public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
         storedDate.set(Calendar.HOUR_OF_DAY, hourOfDay);
         storedDate.set(Calendar.MINUTE, minute);
-        showTime(hourOfDay, minute);
-    }
-
-    private void showTime(int hourOfDay, int minute) {
-        Calendar c = Calendar.getInstance();
-        c.set(Calendar.HOUR_OF_DAY, hourOfDay);
-        c.set(Calendar.MINUTE, minute);
-        SimpleDateFormat f = new SimpleDateFormat("h:mm a");
-        etTime.setText(f.format(c.getTime()));
+        etTime.setText(GlobalConstants.getFormattedTime(hourOfDay, minute));
     }
 }

@@ -16,6 +16,7 @@ import android.widget.CompoundButton;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 
 /**
  * Created by taq on 26/9/2016.
@@ -41,6 +42,7 @@ public class ItemsAdapter extends ArrayAdapter<TodoItem> {
         }
         final TextView tvContent = (TextView) convertView.findViewById(R.id.tvContent);
         CheckBox cbDone = (CheckBox) convertView.findViewById(R.id.cbDone);
+        TextView tvDate = (TextView) convertView.findViewById(R.id.tvDate);
 
         tvContent.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -75,6 +77,15 @@ public class ItemsAdapter extends ArrayAdapter<TodoItem> {
 
         tvContent.setText(item.content);
         cbDone.setChecked(item.finished);
+        if (item.time > 0) {
+            Calendar c = Calendar.getInstance();
+            c.setTimeInMillis(item.time);
+            String date = GlobalConstants.getFormattedDate(c.get(Calendar.YEAR), c.get(Calendar.MONTH), c.get(Calendar.DAY_OF_MONTH), false);
+            String time = GlobalConstants.getFormattedTime(c.get(Calendar.HOUR_OF_DAY), c.get(Calendar.MINUTE));
+            tvDate.setText(date + ", " + time);
+        } else {
+            tvDate.setText("");
+        }
         return convertView;
     }
 
