@@ -13,6 +13,7 @@ import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TimePicker;
+import android.widget.Toast;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -26,18 +27,29 @@ public class EditItemDialogFragment extends DialogFragment implements DatePicker
     private EditText etContent;
     private EditText etDate;
     private EditText etTime;
-    private int position;
+    private Calendar storedDate;
+
 
     public EditItemDialogFragment() {
-
+        storedDate = Calendar.getInstance();
     }
 
     public static EditItemDialogFragment newInstance(String content, int position) {
         EditItemDialogFragment fragment = new EditItemDialogFragment();
         Bundle args = new Bundle();
         args.putString(GlobalConstants.CONTENT, content);
+        args.putInt(GlobalConstants.POSITION, position);
         fragment.setArguments(args);
-        fragment.position = position;
+        return fragment;
+    }
+
+    public static EditItemDialogFragment newInstance(TodoItem todoItem, int position) {
+        EditItemDialogFragment fragment = new EditItemDialogFragment();
+        Bundle args = new Bundle();
+        args.putInt(GlobalConstants.POSITION, position);
+        args.putString(GlobalConstants.CONTENT, todoItem.content);
+        args.putLong(GlobalConstants.TIME, todoItem.time);
+        fragment.setArguments(args);
         return fragment;
     }
 
@@ -55,6 +67,10 @@ public class EditItemDialogFragment extends DialogFragment implements DatePicker
         getDialog().setTitle("Edit item");
 
         String content = getArguments().getString(GlobalConstants.CONTENT, "");
+        final int position = getArguments().getInt(GlobalConstants.POSITION, -1);
+        final long time = getArguments().getLong(GlobalConstants.TIME, 0);
+        storedDate.setTimeInMillis(time);
+
         etContent = (EditText) view.findViewById(R.id.etContent);
         etContent.setText(content);
         etContent.requestFocus();
@@ -71,8 +87,16 @@ public class EditItemDialogFragment extends DialogFragment implements DatePicker
         btnOk.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                if (etContent.getText().toString().equals("")){
+                    Toast.makeText(getActivity(), "Content must not be empty!", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                long newTime = storedDate.getTimeInMillis();
+                if (etDate.getText().toString().isEmpty() || etTime.getText().toString().isEmpty()) {
+                    newTime = 0;
+                }
                 EditItemDialogListener listener = (EditItemDialogListener) getActivity();
-                listener.onFinishEditDialog(etContent.getText().toString(), position);
+                listener.onFinishEditDialog(new TodoItem(etContent.getText().toString(), newTime), position);
                 dismiss();
             }
         });
@@ -82,7 +106,7 @@ public class EditItemDialogFragment extends DialogFragment implements DatePicker
         ivDate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                showPickerDialog(new DatePickerFragment(), "date_picker_fragment");
+                showPickerDialog(new DatePickerFragment(), "date_picker_fragment", time);
             }
         });
 
@@ -91,21 +115,34 @@ public class EditItemDialogFragment extends DialogFragment implements DatePicker
         ivTime.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                showPickerDialog(new TimePickerFragment(), "time_picker_fragment");
+                showPickerDialog(new TimePickerFragment(), "time_picker_fragment", time);
             }
         });
+
+        if (time > 0) {
+            showDate(storedDate.get(Calendar.YEAR), storedDate.get(Calendar.MONTH), storedDate.get(Calendar.DAY_OF_MONTH));
+            showTime(storedDate.get(Calendar.HOUR_OF_DAY), storedDate.get(Calendar.MINUTE));
+        }
     }
 
-    private void showPickerDialog(DialogFragment fragment, String tag) {
+    private void showPickerDialog(DialogFragment fragment, String tag, long time) {
         if (fragment == null) {
             return;
         }
+        Bundle args = new Bundle();
+        args.putLong(GlobalConstants.TIME, time);
+        fragment.setArguments(args);
         fragment.setTargetFragment(EditItemDialogFragment.this, 300);
         fragment.show(getFragmentManager(), tag);
     }
 
     @Override
     public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
+        storedDate.set(year, monthOfYear, dayOfMonth);
+        showDate(year, monthOfYear, dayOfMonth);
+    }
+
+    private void showDate(int year, int monthOfYear, int dayOfMonth) {
         String strDate = "";
         Calendar c = Calendar.getInstance();
         c.add(Calendar.DAY_OF_YEAR, 1);
@@ -122,6 +159,12 @@ public class EditItemDialogFragment extends DialogFragment implements DatePicker
 
     @Override
     public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
+        storedDate.set(Calendar.HOUR_OF_DAY, hourOfDay);
+        storedDate.set(Calendar.MINUTE, minute);
+        showTime(hourOfDay, minute);
+    }
+
+    private void showTime(int hourOfDay, int minute) {
         Calendar c = Calendar.getInstance();
         c.set(Calendar.HOUR_OF_DAY, hourOfDay);
         c.set(Calendar.MINUTE, minute);

@@ -6,4 +6,5 @@ package vn.me.simpletodo;
 
 public interface EditItemDialogListener {
     void onFinishEditDialog(String inputText, int position);
+    void onFinishEditDialog(TodoItem todoItem, int position);
 }

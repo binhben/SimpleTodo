@@ -18,9 +18,17 @@ public class TimePickerFragment extends DialogFragment {
     @NonNull
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
-        Calendar c = Calendar.getInstance();
-        int hour = c.get(Calendar.HOUR_OF_DAY);
-        int minute = c.get(Calendar.MINUTE);
+        int hour, minute;
+        long time = getArguments().getLong(GlobalConstants.TIME, 0);
+        if (time > 0) {
+            Calendar c = Calendar.getInstance();
+            c.setTimeInMillis(time);
+            hour = c.get(Calendar.HOUR_OF_DAY);
+            minute = c.get(Calendar.MINUTE);
+        } else {
+            hour = 8;
+            minute = 0;
+        }
 
         TimePickerDialog.OnTimeSetListener listener = (TimePickerDialog.OnTimeSetListener) getTargetFragment();
 

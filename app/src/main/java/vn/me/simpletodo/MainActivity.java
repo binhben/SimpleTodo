@@ -73,9 +73,24 @@ public class MainActivity extends AppCompatActivity implements EditItemDialogLis
 
     @Override
     public void onFinishEditDialog(String newContent, int position) {
+        if (position == -1) {
+            return;
+        }
         TodoItem item = items.get(position);
         if (!newContent.equals("") && !item.content.equals(newContent)) {
             item.content = newContent;
+            item.save();
+            itemsAdapter.notifyDataSetChanged();
+            Toast.makeText(this, "Edit successfully", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    @Override
+    public void onFinishEditDialog(TodoItem todoItem, int position) {
+        TodoItem item = items.get(position);
+        if (!item.content.equals(todoItem.content) || item.time != todoItem.time) {
+            item.content = todoItem.content;
+            item.time = todoItem.time;
             item.save();
             itemsAdapter.notifyDataSetChanged();
             Toast.makeText(this, "Edit successfully", Toast.LENGTH_SHORT).show();

@@ -3,6 +3,7 @@ package vn.me.simpletodo;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Paint;
 import android.support.annotation.NonNull;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
@@ -10,6 +11,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -36,7 +39,8 @@ public class ItemsAdapter extends ArrayAdapter<TodoItem> {
         if (convertView == null) {
             convertView = LayoutInflater.from(getContext()).inflate(R.layout.todo_item, parent, false);
         }
-        TextView tvContent = (TextView) convertView.findViewById(R.id.tvContent);
+        final TextView tvContent = (TextView) convertView.findViewById(R.id.tvContent);
+        CheckBox cbDone = (CheckBox) convertView.findViewById(R.id.cbDone);
 
         tvContent.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -56,7 +60,21 @@ public class ItemsAdapter extends ArrayAdapter<TodoItem> {
             }
         });
 
+        cbDone.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked) {
+                    tvContent.setPaintFlags(tvContent.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
+                } else {
+                    tvContent.setPaintFlags(tvContent.getPaintFlags() & (~ Paint.STRIKE_THRU_TEXT_FLAG));
+                }
+                item.finished = isChecked;
+                item.save();
+            }
+        });
+
         tvContent.setText(item.content);
+        cbDone.setChecked(item.finished);
         return convertView;
     }
 
@@ -69,7 +87,7 @@ public class ItemsAdapter extends ArrayAdapter<TodoItem> {
 
     private void showEditDialog(TodoItem item, int position) {
         FragmentManager fm = ((AppCompatActivity) mContext).getSupportFragmentManager();
-        EditItemDialogFragment ef = EditItemDialogFragment.newInstance(item.content, position);
+        EditItemDialogFragment ef = EditItemDialogFragment.newInstance(item, position);
         ef.show(fm, "fragment_edit_item");
     }
 }
